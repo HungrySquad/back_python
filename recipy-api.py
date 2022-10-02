@@ -21,9 +21,10 @@ class Post(db.Model):
     ingredients = db.Column(db.String(255))
     image = db.Column(db.String(255), nullable=True)
     time = db.Column(db.String(255))
-    description= db.Column(db.String(255))
+    description = db.Column(db.String(255))
     source = db.Column(db.String(255))
     nutrients = db.Column(db.String(255))
+
     def __repr__(self):
         return "<Recipy %s>" % self.name
 
@@ -40,10 +41,10 @@ class PostSchema(Schema):
     time = fields.Str()
     source = fields.Str()
     image = fields.Str()
-    servings = fields.Str(required=False,default="")
+    servings = fields.Str(required=False, default="")
 
     @post_load
-    def create_post(self,data,**kwargs):
+    def create_post(self, data, **kwargs):
         new_post = Post(
             # id=data['id'],
             name=data["name"],
@@ -52,9 +53,10 @@ class PostSchema(Schema):
             source=data["source"],
             nutrients=data["nutrients"],
             description=data["description"],
-            image=data['image']
+            image=data["image"],
         )
         return new_post
+
 
 class PostListResource(Resource):
     def get(self):
@@ -62,19 +64,37 @@ class PostListResource(Resource):
         return posts_schema.dump(posts)
 
     def post(self):
-        
-        try: 
+
+        try:
             db_post_data = post_schema.load(request.json)
             db.session.add(db_post_data)
             db.session.commit()
-            return {f"{str(db_post_data)} has been added":True}
+            return {f"{str(db_post_data)} has been added": True}
         except ValidationError as e:
             return str(e)
+
 
 class PostResource(Resource):
     def get(self, post_id):
         post = Post.query.get_or_404(post_id)
         return post_schema.dump(post)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     def patch(self, post_id):
         post = Post.query.get_or_404(post_id)  # object of the POST class by ID
