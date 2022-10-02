@@ -31,9 +31,11 @@ class Post(db.Model):  # pylint: disable=too-few-public-methods
     ingredients = db.Column(db.String(255))
     image = db.Column(db.String(255), nullable=True)
     time = db.Column(db.String(255))
-    description = db.Column(db.String(255))
+    description = db.Column(db.String(3000))
     source = db.Column(db.String(255))
     nutrients = db.Column(db.String(255))
+    instructions = db.Column(db.String(4000))
+    servings = db.Column(db.String(255))
 
     def __repr__(self):
         return f"<Recipy {self.name}>"
@@ -55,7 +57,8 @@ class PostSchema(Schema):
     time = fields.Str()
     source = fields.Str()
     image = fields.Str()
-    servings = fields.Str(required=False, default="")
+    servings = fields.Str(required=True, default="1")
+    instructions = fields.Str()
 
     @post_load
     def create_post(self, data, **kwargs):  # pylint: disable=unused-argument
@@ -70,6 +73,8 @@ class PostSchema(Schema):
             nutrients=data["nutrients"],
             description=data["description"],
             image=data["image"],
+            instructions=data["instructions"],
+            servings=data["servings"]
         )
         return new_post
 
