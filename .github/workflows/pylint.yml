@@ -20,4 +20,4 @@ jobs:
         pip install pylint_flask pylint_flask_sqlalchemy
     - name: Analysing the code with pylint
       run: |
-        pylint --load-plugins pylint_flask,pylint_flask_sqlalchemy recipy-api.py $(git ls-files '*.py')
+        pylint --load-plugins pylint_flask,pylint_flask_sqlalchemy $(git ls-files '*.py')
