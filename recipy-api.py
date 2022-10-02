@@ -79,23 +79,6 @@ class PostResource(Resource):
         post = Post.query.get_or_404(post_id)
         return post_schema.dump(post)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     def patch(self, post_id):
         post = Post.query.get_or_404(post_id)  # object of the POST class by ID
         post.query.update(request.json)
