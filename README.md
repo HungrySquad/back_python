@@ -8,10 +8,10 @@ Install requirements
 `pip3 install -r requirements.txt`
 
 #### Create a recipies.db file:
-Run convert_json_to_db.py 
+`python3 convert_json_to_db.py`
 
 #### Run the API locally
-`/home/mea/.virtualenvs/hungrysquad/bin/python /home/mea/Dev/Project/recipy-api.py`
+`python3 recipy_api.py`
 
 Test POST
 ```
