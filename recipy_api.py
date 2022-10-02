@@ -1,3 +1,7 @@
+"""
+Testing Version of the API using Flask/SQLAlchemy/Marshmallow
+"""
+
 from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy  # new
 from flask_marshmallow import Marshmallow  # new
@@ -14,8 +18,14 @@ ma = Marshmallow(app)  # new scheme documentation
 
 api = Api(app)  # new restful api for flask
 
+"Diasbled too-few-public-methods due to the class Post needing to be this way to be corretly Mapped"
 
-class Post(db.Model):
+
+class Post(db.Model):  # pylint: disable=too-few-public-methods
+    """
+    Class Post for creating a db.Model for new entries in the SQLALCHEMY database
+    """
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50))
     ingredients = db.Column(db.String(255))
@@ -26,10 +36,14 @@ class Post(db.Model):
     nutrients = db.Column(db.String(255))
 
     def __repr__(self):
-        return "<Recipy %s>" % self.name
+        return f"<Recipy {self.name}>"
 
 
 class PostSchema(Schema):
+    """
+    Schema for serializing and de-serializing the data
+    """
+
     # class Meta:
     #     fields = ("id", "name", "ingredients","nutrients", "description","time", "source")
     #     model = Post
@@ -44,9 +58,11 @@ class PostSchema(Schema):
     servings = fields.Str(required=False, default="")
 
     @post_load
-    def create_post(self, data, **kwargs):
+    def create_post(self, data, **kwargs):  # pylint: disable=unused-argument
+        """
+        Method to validate the data using the Scheme and return the data in db object
+        """
         new_post = Post(
-            # id=data['id'],
             name=data["name"],
             ingredients=data["ingredients"],
             time=data["time"],
@@ -59,35 +75,66 @@ class PostSchema(Schema):
 
 
 class PostListResource(Resource):
+    """
+    Class for the REST flask api which describes 2
+    REST methods Used for  get (all entries) and single post
+    """
+
     def get(self):
+        """
+        REST API 'GET' method to retrieve all API entries
+        """
         posts = Post.query.all()
         return posts_schema.dump(posts)
 
     def post(self):
-
+        """
+        REST API 'POST' method to add a new API entry
+        """
         try:
             db_post_data = post_schema.load(request.json)
             db.session.add(db_post_data)
             db.session.commit()
             return {f"{str(db_post_data)} has been added": True}
-        except ValidationError as e:
-            return str(e)
+        except ValidationError as error:
+            return str(error)
 
 
 class PostResource(Resource):
+    """
+    Class for the REST flask api which describes 3
+    REST methods used for get(single) and patch/delte (single)
+    """
+
     def get(self, post_id):
+        """
+        REST API 'GET' method to retrieve single API entry by post_id
+        """
         post = Post.query.get_or_404(post_id)
         return post_schema.dump(post)
 
     def patch(self, post_id):
+        """
+        REST API 'PATCH' method to patch an API entry by post_id
+        """
         post = Post.query.get_or_404(post_id)  # object of the POST class by ID
         post.query.update(request.json)
-        # request.json  {'name': 'Chocolate', 'ingredients': 'Lorem ipsum', 'cookTime': 'Lorem Ipsum 5 m', 'prepTime': 'LoremIpsum 10m', 'source': 'your mom'}
+        # request.json
+        # {
+        # 'name': 'Chocolate',
+        # 'ingredients': 'Lorem ipsum',
+        # 'cookTime': 'Lorem Ipsum 5 m',
+        # 'prepTime': 'LoremIpsum 10m',
+        # 'source': 'your mom'
+        # }
 
         db.session.commit()
         return post_schema.dump(post)
 
     def delete(self, post_id):
+        """
+        REST API 'DELETE' method to delete an API entry by post_id
+        """
         post = Post.query.get_or_404(post_id)
         db.session.delete(post)
         db.session.commit()
