@@ -2,11 +2,15 @@
 
 
 ## Better to use the venv and vierutalenvwrapper
+### For Local Environment:
 
 Install requirements
 `pip3 install -r requirements.txt`
 
-Run the API locally
+#### Create a recipies.db file:
+Run convert_json_to_db.py 
+
+#### Run the API locally
 `/home/mea/.virtualenvs/hungrysquad/bin/python /home/mea/Dev/Project/recipy-api.py`
 
 Test POST
