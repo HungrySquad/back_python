@@ -7,6 +7,7 @@ from flask_sqlalchemy import SQLAlchemy  # new
 from flask_marshmallow import Marshmallow  # new
 from flask_restful import Api, Resource  # new
 from marshmallow import Schema, fields, post_load, ValidationError
+from waitress import serve
 
 app = Flask(__name__)
 
@@ -156,5 +157,4 @@ api.add_resource(PostListResource, "/posts")
 
 
 if __name__ == "__main__":
-    from waitress import serve
     serve(app, host="0.0.0.0", port=8080)
