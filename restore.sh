@@ -1,0 +1,1 @@
+cat dump.sql | docker exec -i pg_db psql -U web_api -d RecipyMania
