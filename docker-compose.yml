@@ -1,0 +1,44 @@
+version: '3.8'
+services:
+  recipies_api:
+    container_name: recipies_api
+    build: .
+    command: 'uvicorn app.main:app --host 0.0.0.0'
+    volumes:
+      - .:/app
+    # used for testing purposes, maps the port 8000 to the hosts 8008 port
+    ports:
+      - 8008:8000
+    # used to expose 8000 to the services from the same docker network and is not reachable from host
+    expose:
+      - 8000
+    environment:
+      - DB_CONNECTION_STRING=postgresql://${PG_DB_USER}:${PG_DB_PASSWORD}@db:5432/${PG_DB_NAME}
+    depends_on:
+      db:
+         condition: service_healthy
+    networks:
+      - prod_net
+  db:
+    container_name: pg_db
+    image: postgres:15.0-alpine3.16
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    expose:
+      - 5432
+    environment:
+      - POSTGRES_USER=${PG_DB_USER}
+      - POSTGRES_PASSWORD=${PG_DB_PASSWORD}
+      - POSTGRES_DB=${PG_DB_NAME}
+    healthcheck: #used by depends_on so the api only starts after the db is up
+        test: ["CMD", "pg_isready",  "-d", "RecipyMania", "-U", "web_api"]
+        interval: 10s
+        timeout: 5s
+        retries: 5
+    networks:
+      - prod_net
+networks:
+  prod_net:
+    name: prod_network
+volumes:
+  postgres_data:
