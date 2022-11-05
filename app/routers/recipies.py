@@ -5,19 +5,20 @@
 Main routing module for API for the recipies with defined REST HTTP methods
 """
 
-from typing import List
 from sqlalchemy.orm import Session
 from fastapi import Depends, Response, status, HTTPException, APIRouter
+from fastapi_pagination import Page, paginate
+
 from .. import models, schemas
 from ..database import engine, get_db
-
+from ..models import Recipy
 
 models.Base.metadata.create_all(bind=engine)
 
 router = APIRouter(prefix="/recipies", tags=["Recipies"])
 
 
-@router.get("/", response_model=List[schemas.RecipyResponse])
+@router.get("/", response_model=Page[schemas.RecipyResponse])
 def get_recipies(db: Session = Depends(get_db)):
     """
     Get all recipies
@@ -25,7 +26,7 @@ def get_recipies(db: Session = Depends(get_db)):
     recipies = db.query(models.Recipy).all()
     # cursor.execute("""SELECT * FROM recipies""")
     # recipies = cursor.fetchall()
-    return recipies
+    return paginate(recipies)
 
 
 @router.post(
@@ -57,6 +58,19 @@ def get_recipy(id: int, db: Session = Depends(get_db)):
         )
     return recipy
 
+@router.get("/search/{search_string}", response_model=Page[schemas.RecipyResponse])
+def search_recipies_by_name(search_string: str, db: Session = Depends(get_db)):
+    """
+    Search using iLike through the recepies names. Returns paged response with found items
+    """
+    search = f"%{search_string}%"
+    recipies = db.query(Recipy).filter(Recipy.name.ilike(search)).all()
+    if not recipies:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Sorry, no recepies with {search_string} in the name.",
+        )
+    return paginate(recipies)
 
 @router.delete("/{id}")
 def remove_recipy(id: int, db: Session = Depends(get_db)):
