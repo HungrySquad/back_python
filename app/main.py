@@ -3,8 +3,8 @@ Main file to run the API
 """
 
 from fastapi import FastAPI
-from .routers import recipies
 from fastapi_pagination import add_pagination
+from .routers import recipies
 
 app = FastAPI()
 

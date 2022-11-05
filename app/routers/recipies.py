@@ -5,10 +5,9 @@
 Main routing module for API for the recipies with defined REST HTTP methods
 """
 
-from typing import List
 from sqlalchemy.orm import Session
 from fastapi import Depends, Response, status, HTTPException, APIRouter
-from fastapi_pagination import Page, add_pagination, paginate
+from fastapi_pagination import Page, paginate
 
 from .. import models, schemas
 from ..database import engine, get_db
@@ -60,7 +59,7 @@ def get_recipy(id: int, db: Session = Depends(get_db)):
     return recipy
 
 @router.get("/search/{search_string}", response_model=Page[schemas.RecipyResponse])
-def get_recipy(search_string: str, db: Session = Depends(get_db)):
+def search_recipies_by_name(search_string: str, db: Session = Depends(get_db)):
     """
     Search using iLike through the recepies names. Returns paged response with found items
     """
