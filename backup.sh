@@ -1,1 +1,1 @@
-docker exec -t pg_db pg_dumpall -c -U web_api > dump.sql
+docker exec -t pg_db pg_dump -E UTF8 -c -U web_api -d RecipyMania> dump_full.sql
